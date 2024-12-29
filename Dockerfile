@@ -12,6 +12,9 @@ RUN apt-get update && apt-get install -y \
     make \
     && rm -rf /var/lib/apt/lists/*
 
+# Ensure python command is available
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
 # Set the working directory inside the container
 WORKDIR /compilers
 
@@ -40,5 +43,9 @@ USER safeuser
 # Expose the port your application runs on
 EXPOSE 9999
 
+# Set environment variables for JVM memory settings
+ENV JAVA_OPTS="-Xms512m -Xmx2g"
+
 # Specify the command to run your application
-CMD ["java", "-jar", "target/compilers.jar"]
+# Use the shell form of ENTRYPOINT to ensure that environment variables are expanded correctly
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar target/compilers.jar"]
